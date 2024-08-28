@@ -1,0 +1,51 @@
+~ > speaker-test
+
+speaker-test 1.2.11
+
+Playback device is default
+Stream parameters are 48000Hz, S16_LE, 1 channels
+Using 16 octaves of pink noise
+ALSA lib /var/tmp/portage/media-libs/alsa-lib-1.2.11/work/alsa-lib-1.2.11/src/pcm/pcm_direct.c:2107:(snd1_pcm_direct_parse_open_conf) Unknown field format
+Playback open error: -22,Invalid argument
+
+~ > aplay -l
+**** List of PLAYBACK Hardware Devices ****
+card 0: PCH [HDA Intel PCH], device 0: ALC269VC Analog [ALC269VC Analog]
+  Subdevices: 1/1
+  Subdevice #0: subdevice #0
+card 0: PCH [HDA Intel PCH], device 3: HDMI 0 [HDMI 0]
+  Subdevices: 1/1
+  Subdevice #0: subdevice #0
+card 0: PCH [HDA Intel PCH], device 7: HDMI 1 [HDMI 1]
+  Subdevices: 1/1
+  Subdevice #0: subdevice #0
+card 0: PCH [HDA Intel PCH], device 8: HDMI 2 [HDMI 2]
+  Subdevices: 1/1
+  Subdevice #0: subdevice #0
+
+~ > cat /etc/asound.conf
+defaults.pcm.rate_converter "samplerate_best"
+
+pcm.snd_card {
+        type hw
+        card 0
+}
+
+pcm.dmixerout {
+        type dmix
+	format S32_LE
+        ipc_key 1024
+        ipc_key_add_uid false
+        ipc_perm 0660
+        slave {
+                pcm "snd_card"
+                channels 2
+		buffer_size 65536
+		rate 48000
+	}
+}
+
+pcm.!default {
+    type plug
+    slave.pcm "dmixerout"
+}
